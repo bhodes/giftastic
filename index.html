@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Giphy Project</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style type="text/css">
+        button,
+        div,
+        form,
+        input {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="buttonsHere"></div>
+
+
+    <form id="actor-form">
+        <label for="gif-input">Add an Actor!</label>
+        <input type="text" id="gif-input"><br>
+
+        <input id="add-gif" type="submit" value="Add an Actor!">
+    </form>
+
+    <div id="gifsHere"></div>
+
+    <script type="text/javascript">
+        var topics = ["Jim Carrey", "Chris Farley", "Samuel L. Jackson", "Heath Ledger", "Leonardo Dicaprio", "John Travolta", "Al Pacino", "Robert De Niro", "Ben Affleck", "John Hamm", "Christian Bale"]
+
+        for (i = 0; i < topics.length; i++) {
+            var a = $("<button>");
+            a.addClass("actor-btn");
+            a.attr('data-name', topics[i]);
+            a.text(topics[i]);
+            $("#buttonsHere").append(a)
+        }
+
+        function displayGifs() {
+            var person = $(this).attr("data-name");
+            var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + person + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            }).then(function showGifs(response) {
+                var results = response.data;
+               
+                for (var i = 0; i < results.length; i++) {
+                    
+                    if (results[i].rating !== "r" && results[i].rating !== "pg-13") {                        
+                        var gifDiv = $("<div class='item'>");
+                        var rating = results[i].rating;
+                        var p = $("<p>").text("Rating: " + rating);               
+                        var personImage = $("<img>");
+
+                        personImage.attr("src", results[i].images.fixed_height.url);
+
+                        gifDiv.append(p);
+                        gifDiv.append(personImage);
+
+                        $("#gifsHere").prepend(gifDiv);
+                    }
+                }
+            })
+        }
+        // Function for displaying movie data
+        function renderButtons() {
+
+            
+            $("#buttonsHere").empty();
+
+            
+            for (var i = 0; i < topics.length; i++) {
+                var a = $("<button>");
+                a.addClass("actor-btn");
+                a.attr("data-name", topics[i]);
+                a.text(topics[i]);
+                $("#buttonsHere").append(a);
+            }
+        }
+
+        $("#add-gif").on("click", function (event) {
+            event.preventDefault();
+            var actor = $("#gif-input").val().trim();
+            topics.push(actor);
+            renderButtons();
+        });
+
+        $(document).on("click", ".actor-btn", displayGifs);
+
+        renderButtons();
+
+
+//Could not figure out how to make images stop and go with click events
+
+
+    </script>
+
+</body>
+
+</html>
